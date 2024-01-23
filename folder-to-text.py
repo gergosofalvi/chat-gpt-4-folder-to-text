@@ -1,8 +1,19 @@
 import os
 import sys
 from tqdm import tqdm
+from multiprocessing import Pool
 
-def write_directory_structure_to_file(directory_path, output_file_name, failed_files, exclude=[]):
+def process_file(file_path):
+    failed_files = []
+    try:
+        with open(file_path, 'r', encoding='utf-8') as input_file:
+            content = input_file.read()
+        return file_path, content, None
+    except UnicodeDecodeError:
+        failed_files.append(file_path)
+        return file_path, None, "Failed to decode the file, as it is not saved with UTF-8 encoding."
+
+def write_directory_structure_to_file(directory_path, output_file_name, exclude=[]):
     total_files = 0
     copied_files = 0
 
@@ -21,20 +32,20 @@ def write_directory_structure_to_file(directory_path, output_file_name, failed_f
                 file_list.append(file_path)
 
     with open(output_file_name, 'w', encoding='utf-8') as output_file:
-        with tqdm(total=len(file_list), desc="Progress", unit=" file") as pbar:
-            for file_path in file_list:
-                pbar.update(1)
-                total_files += 1
+        with Pool() as pool:
+            results = list(tqdm(pool.imap(process_file, file_list), total=len(file_list), desc="Progress", unit=" file"))
 
-                output_file.write(f"{file_path}\n")
-                try:
-                    with open(file_path, 'r', encoding='utf-8') as input_file:
-                        output_file.write(input_file.read())
-                    copied_files += 1
-                except UnicodeDecodeError:
-                    failed_files.append(file_path)
-                    output_file.write("Failed to decode the file, as it is not saved with UTF-8 encoding.\n")
-                output_file.write("---\n")
+        for result in results:
+            total_files += 1
+            if result[1] is not None:
+                file_name_line = f"--- START FILE: {result[0]} ---\n"
+                output_file.write(file_name_line)
+                output_file.write(result[1] + "\n")
+                end_line = f"--- END FILE: {result[0]} ---\n"
+                output_file.write(end_line)
+                copied_files += 1
+            if result[2] is not None:
+                output_file.write(f"{result[0]}\n{result[2]}\n")
 
     return total_files, copied_files
 
@@ -48,14 +59,7 @@ if __name__ == "__main__":
 
     exclude = ["node_modules/", ".git/", "build", "test", ".gitignore", ".DS_Store", ".jpg", ".png", ".svg"]
 
-    failed_files = []
-
-    total_files, copied_files = write_directory_structure_to_file(input_directory, output_file_name, failed_files, exclude)
+    total_files, copied_files = write_directory_structure_to_file(input_directory, output_file_name, exclude)
 
     print(f"There are a total of {total_files} files in the {input_directory} directory.")
     print(f"A total of {copied_files} files have been copied to {output_file_name}.")
-
-    if failed_files:
-        print(f"The following files could not be decoded ({len(failed_files)} files):")
-        for file_path in failed_files:
-            print(file_path)

@@ -8,7 +8,8 @@ Usage
 
 1.  Install the required packages:
 ```bash
-pip install tqdm
+pip3 install tqdm
+pip3 install pool
 ```
 3.  Run the script with the following command:
 ```bash

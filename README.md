@@ -46,8 +46,3 @@ Limitations
 -----------
 
 This script only processes text-based files and may not work with binary or non-standard file formats.
-
-License
--------
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

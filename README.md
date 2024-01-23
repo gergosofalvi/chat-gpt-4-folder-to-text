@@ -7,13 +7,13 @@ Usage
 -----
 
 1.  Install the required packages:
-    ```bash
-    pip install tqdm
-    ```
+```bash
+pip install tqdm
+```
 3.  Run the script with the following command:
-    ```bash
-    python3 folder-to-text.py <directory path> <output file name>
-    ```
+```bash
+python3 folder-to-text.py <directory path> <output file name>
+```
 *   `<directory path>`: The path to the directory you want to convert (e.g., /Users/username/Documents/project/).
 *   `<output file name>`: The desired name of the output text file (without the .txt extension, e.g., project).
 
@@ -25,9 +25,9 @@ Example
 -------
 
 To convert a directory located at '/Users/username/Documents/project/' into a text file named 'project.txt', run the following command:
-    ```bash
-    python3 folder-to-text.py /Users/username/Documents/project/ project
-    ```
+```bash
+python3 folder-to-text.py /Users/username/Documents/project/ project
+```
 Excluded Files and Folders
 --------------------------
 
